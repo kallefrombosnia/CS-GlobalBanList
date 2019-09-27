@@ -1,25 +1,69 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 
-class Api extends CI_Controller {
+require APPPATH . '/libraries/REST_Controller.php';
 
-	/**
-	 * Index Page for this controller.
-	 *
-	 * Maps to the following URL
-	 * 		http://example.com/index.php/welcome
-	 *	- or -
-	 * 		http://example.com/index.php/welcome/index
-	 *	- or -
-	 * Since this controller is set as the default controller in
-	 * config/routes.php, it's displayed at http://example.com/
-	 *
-	 * So any other public methods not prefixed with an underscore will
-	 * map to /index.php/welcome/<method_name>
-	 * @see https://codeigniter.com/user_guide/general/urls.html
-	 */
-	public function index()
-	{
-		$this->load->view('welcome_message');
-	}
+class Api extends REST_Controller
+{
+
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
+    public function bans_get()
+    {
+        if ($this->api_model->checkAuth($this->input->get('apikey'))) {
+
+            $bans = $this->api_model->getAllBans();
+            return $this->set_response($this->api_model->generateOutput(true, array(), $bans));
+        } else {
+            return $this->set_response($this->api_model->generateOutput(false, array('Error: apikey potreban'), false));
+        }
+    }
+
+    public function banview_get($type = null, $id = null)
+    {
+        if ($this->api_model->checkAuth($this->input->get('apikey'))) {
+
+            $typelist = array('nick', 'steamid', 'ip');
+
+            if (empty($id)) {
+                return $this->set_response($this->api_model->generateOutput(false, array('Error: id bana nije specificiran'), false));
+            }
+
+            if (!in_array($type, $typelist)) {
+                return $this->set_response($this->api_model->generateOutput(false, array('Error: type nije validan'), false));
+            }
+
+            $ban = $this->api_model->getBan($id, $type);
+            $this->set_response($this->api_model->generateOutput(true, array(), $ban));
+        } else {
+            return $this->set_response($this->api_model->generateOutput(false, array('Error: apikey potreban'), false));
+        }
+
+    }
+
+    public function checkplayer_get($type = null, $id = null)
+    {
+        if ($this->api_model->checkAuth($this->input->get('apikey'))) {
+
+            $typelist = array('nick', 'steamid', 'ip');
+
+            if (empty($id)) {
+                return $this->set_response($this->api_model->generateOutput(false, array('Error: id bana nije specificiran'), false));
+            }
+
+            if (!in_array($type, $typelist)) {
+                return $this->set_response($this->api_model->generateOutput(false, array('Error: type nije validan'), false));
+            }
+
+            $boolValue = $this->api_model->checkPlayerForBan($id, $type);
+            return $this->set_response($this->api_model->generateOutput(true, array(), $boolValue));
+
+        } else {
+            return $this->set_response($this->api_model->generateOutput(false, array('Error: apikey potreban'), false));
+        }
+
+    }
 }
