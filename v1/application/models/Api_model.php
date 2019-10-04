@@ -54,100 +54,29 @@ class Api_model extends CI_Model
 
         $query = $this->db->query("SELECT 1 FROM `banlist` WHERE `$type`=$id LIMIT 1");
 
-        return $query->num_rows() > 0 ? "true" : "false";
+        return $query->num_rows() > 0 ? true : false;
 
     }
 
 
+    public function banAdd($data){
 
-    public function insert($data){
+        $this->db->set('created_at', 'NOW()', FALSE);
+        $this->db->set('updated_at', 'NOW()', FALSE);
 
-
-
-        $this->user_name    = $data['name']; // please read the below note
-
-        $this->user_password  = $data['pass'];
-
-        $this->user_type = $data['type'];
-
-
-
-        if($this->db->insert('tbl_user',$this))
-
-        {    
-
-            return 'Data is inserted successfully';
-
-        }
-
-            else
-
-        {
-
-            return "Error has occured";
-
-        }
-
+        return $this->db->insert('banlist', $data);
     }
 
+    public function banDelete($type, $id){
 
+        $this->db->where($type, $id);
+        $this->db->delete('banlist');
 
-    public function update($id,$data){
-
-
-
-        $this->user_name    = $data['name']; // please read the below note
-
-        $this->user_password  = $data['pass'];
-
-        $this->user_type = $data['type'];
-
-        $result = $this->db->update('tbl_user',$this,array('user_id' => $id));
-
-        if($result)
-
-        {
-
-            return "Data is updated successfully";
-
-        }
-
-        else
-
-        {
-
-            return "Error has occurred";
-
-        }
+        if($this->checkPlayerForBan($id, $type)){
+            return false;
+        }else{
+            return true;
+        };
 
     }
-
-
-
-    public function delete($id){
-
-
-
-        $result = $this->db->query("delete from `tbl_user` where user_id = $id");
-
-        if($result)
-
-        {
-
-            return "Data is deleted successfully";
-
-        }
-
-        else
-
-        {
-
-            return "Error has occurred";
-
-        }
-
-    }
-
-
-
 }
