@@ -1,70 +1,143 @@
 ###################
-What is CodeIgniter
+CS-GlobalBanList API
 ###################
 
-CodeIgniter is an Application Development Framework - a toolkit - for people
-who build web sites using PHP. Its goal is to enable you to develop projects
-much faster than you could if you were writing code from scratch, by providing
-a rich set of libraries for commonly needed tasks, as well as a simple
-interface and logical structure to access these libraries. CodeIgniter lets
-you creatively focus on your project by minimizing the amount of code needed
-for a given task.
-
-*******************
-Release Information
-*******************
-
-This repo contains in-development code for future releases. To download the
-latest stable release please visit the `CodeIgniter Downloads
-<https://codeigniter.com/download>`_ page.
+CS-GlobalBanList API je ideja da se stvori centralna ban lista citera koji su pali na rechekeru ili manuelnom banu administracije.
+Projekt je napravljen u PHP, a za framework je koristen Codeigniter 3.0 i rest server library da bi se olaksao rad.
+Zbog nemogucnosti amxx plugina da salje POST requeste, simuliran je POST uz pomoc GET request-a.
 
 **************************
 Changelog and New Features
 **************************
 
-You can find a list of all changes for each release in the `user
-guide change log <https://github.com/bcit-ci/CodeIgniter/blob/develop/user_guide_src/source/changelog.rst>`_.
+Zadnja verzija je v1,dok je planirana mogucnost daljnjih update ako ideja pronadje zainteresovanost cs communitya.
 
-*******************
-Server Requirements
-*******************
 
-PHP version 5.6 or newer is recommended.
+**************************
+Dokumentacija
+**************************
 
-It should work on 5.3.7 as well, but we strongly advise you NOT to run
-such old versions of PHP, because of potential security and performance
-issues, as well as missing features.
+U configs/ban-config.php morate odluciti da li zelite koristenje auth keya prilikom koristenja api servisa. Ako je iskljucen auth nije potrebno postaviti apikey u url
 
-************
-Installation
-************
+Note: trenutno ne radi ta funkcija
 
-Please see the `installation section <https://codeigniter.com/user_guide/installation/index.html>`_
-of the CodeIgniter User Guide.
+Example: domain/v1/banlist?apikey=nekiauthkey
 
-*******
-License
-*******
 
-Please see the `license
-agreement <https://github.com/bcit-ci/CodeIgniter/blob/develop/user_guide_src/source/license.rst>`_.
+1. API: pokazi sve banove iz ban liste = radi
 
-*********
-Resources
-*********
+Example get: domain/v1/banlist?apikey=nekiauthkey
 
--  `User Guide <https://codeigniter.com/docs>`_
--  `Language File Translations <https://github.com/bcit-ci/codeigniter3-translations>`_
--  `Community Forums <http://forum.codeigniter.com/>`_
--  `Community Wiki <https://github.com/bcit-ci/CodeIgniter/wiki>`_
--  `Community Slack Channel <https://codeigniterchat.slack.com>`_
+Returns: 
+{
+  "success": true,
+  "errors": [
+    
+  ],
+  "data": [
+    {
+      "id": "1",
+      "nick": "kalle",
+      "steamid": "1",
+      "ip": "1111212",
+      "resource": "dwd212312",
+      "server_ip": "1313`3`3`3`3`3`3`",
+      "updated_at": "2019-09-18 20:02:09",
+      "created_at": "2019-09-18 20:02:09"
+    },
+    {
+      "id": "8",
+      "nick": "kalle1g",
+      "steamid": "kkk",
+      "ip": "33333333",
+      "resource": "",
+      "server_ip": "gggg",
+      "updated_at": "2019-10-04 21:23:28",
+      "created_at": "2019-10-04 21:23:28"
+    }
+  ]
+}
 
-Report security issues to our `Security Panel <mailto:security@codeigniter.com>`_
-or via our `page on HackerOne <https://hackerone.com/codeigniter>`_, thank you.
+2. API: pokazi specifican ban = radi
 
-***************
-Acknowledgement
-***************
+type = steamid,nick, ip
+id = vrijednost type preko kojeg zelite da vidite vrijednost bana ako postoji, ako ne postoji vraca se prazan input 
 
-The CodeIgniter team would like to thank EllisLab, all the
-contributors to the CodeIgniter project and you, the CodeIgniter user.
+Example get: domain/v1/banview/{type}/{id}?apikey=nekiauthkey
+
+Returns: 
+{
+  "success": true,
+  "errors": [
+    
+  ],
+  "data": [
+    {
+      "id": "1",
+      "nick": "kalle",
+      "steamid": "1",
+      "ip": "1111212",
+      "resource": "dwd212312",
+      "server_ip": "1313`3`3`3`3`3`3`",
+      "updated_at": "2019-09-18 20:02:09",
+      "created_at": "2019-09-18 20:02:09"
+    }
+  ]
+}
+
+3. API: provjeri da li je igrac banovan = radi
+Note: razlika izmedju checkplayer i banview je ta sto ne morate provjeravati u vasem kodu da li je igrac banovan, sa checkplayer dobijete gotovu informaciju u obliku bool
+
+type = steamid,nick, ip
+id = vrijednost type preko kojeg zelite da vidite vrijednost bana ako postoji, ako ne postoji vraca se prazan input 
+
+Example get: domain/v1/checkplayer/{type}/{id}?apikey=nekiauthkey
+
+Returns:
+{
+  "success": true,
+  "errors": [
+    
+  ],
+  "data": true
+}
+
+4. API: dodaj ban = radi
+Note: banadd radi ali samo sa trusted informacijama i nema nikakve provjere kao ni sanatizacije inputa, te se mora zastitit u buducnosti
+Ako izostavite neki parametar vrv ce baciti error te ban nece biti upisan regularno
+
+Example get: domain/v1/api/banadd/?apikey=1&nick=kly&steamid=50&resource=opengl&server_ip=localhost&ip=mojip
+
+Returns: //
+
+5. API: izbrisi ban = radi
+Note: nije implemenitirana pametna provjera, return je uvijek true
+
+type = steamid,nick, ip
+id = id bana kojeg zelite izbrisati
+
+Example get: domain/v1/bandelete/{type}/{id}?apikey=nekiauthkey
+
+Returns:
+{
+  "success": true,
+  "errors": [
+    
+  ],
+  "data": true
+}
+
+
+HVALA SVIMA KOJI OVO PROCITAJU, NEMA VECE BUDALE OD TEBE LPPP.
+
+
+
+
+
+
+
+
+
+
+
+
