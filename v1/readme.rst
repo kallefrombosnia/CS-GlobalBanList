@@ -21,12 +21,12 @@ U configs/ban-config.php morate odluciti da li zelite koristenje auth keya prili
 
 Note: trenutno ne radi ta funkcija
 
-Example: domain/v1/banlist?apikey=nekiauthkey
+Example: domain/v1/api/banlist?apikey=nekiauthkey
 
 
 1. API: pokazi sve banove iz ban liste = radi
 
-Example get: domain/v1/banlist?apikey=nekiauthkey
+Example get: domain/v1/api/banlist?apikey=nekiauthkey
 
 Returns: 
 {
@@ -63,7 +63,7 @@ Returns:
 type = steamid,nick, ip
 id = vrijednost type preko kojeg zelite da vidite vrijednost bana ako postoji, ako ne postoji vraca se prazan input 
 
-Example get: domain/v1/banview/{type}/{id}?apikey=nekiauthkey
+Example get: domain/v1/api/banview/{type}/{id}?apikey=nekiauthkey
 
 Returns: 
 {
@@ -91,7 +91,7 @@ Note: razlika izmedju checkplayer i banview je ta sto ne morate provjeravati u v
 type = steamid,nick, ip
 id = vrijednost type preko kojeg zelite da vidite vrijednost bana ako postoji, ako ne postoji vraca se prazan input 
 
-Example get: domain/v1/checkplayer/{type}/{id}?apikey=nekiauthkey
+Example get: domain/v1/api/checkplayer/{type}/{id}?apikey=nekiauthkey
 
 Returns:
 {
@@ -111,12 +111,26 @@ Example get: domain/v1/api/banadd/?apikey=1&nick=kly&steamid=50&resource=opengl&
 Returns: //
 
 5. API: izbrisi ban = radi
-Note: nije implemenitirana pametna provjera, return je uvijek true
 
 type = steamid,nick, ip
 id = id bana kojeg zelite izbrisati
 
-Example get: domain/v1/bandelete/{type}/{id}?apikey=nekiauthkey
+Example get: domain/v1/api/bandelete/{type}/{id}?apikey=nekiauthkey
+
+Returns:
+{
+  "success": true,
+  "errors": [
+    
+  ],
+  "data": true
+}
+
+6. API: version = radi
+
+id = api / plugin
+
+Example get: domain/v1/api/version/{id}?apikey=nekiauthkey
 
 Returns:
 {

@@ -26,12 +26,21 @@ class Api_model extends CI_Model
     }
     
     public function checkAuth($apikey = null){
+
         if($this->config->item('auth')){
             if(!is_null($apikey)){
-                return true;
+                $query = $this->db->query("SELECT 1 FROM `access_keys` WHERE `access_key`= $apikey LIMIT 1");
+
+                if($query->num_rows() > 0){
+                    //key exists
+                    return true;
+                }
+                return false;
             }
-            return false;
-        }
+        }else{
+            // disabled in config but still pass function
+            return true;
+        }     
     }
 
 
@@ -63,8 +72,9 @@ class Api_model extends CI_Model
 
         $this->db->set('created_at', 'NOW()', FALSE);
         $this->db->set('updated_at', 'NOW()', FALSE);
+        $this->db->insert('banlist', $data);
 
-        return $this->db->insert('banlist', $data);
+        return $this->db->affected_rows() > 0;
     }
 
     public function banDelete($type, $id){
@@ -72,11 +82,22 @@ class Api_model extends CI_Model
         $this->db->where($type, $id);
         $this->db->delete('banlist');
 
-        if($this->checkPlayerForBan($id, $type)){
-            return false;
-        }else{
-            return true;
-        };
+        return $this->db->affected_rows() > 0;
+    }
 
+    public function version($type){
+
+        $query = $this->db->query("SELECT * FROM `version` ");
+        $info = $query->result_array();
+
+        switch ($type) {
+            case 'api':           
+                return $info[0]['api_version']; 
+            case 'server':
+                return $info[0]['plugin_version']; 
+            default:
+                    return false;
+                break;
+        }
     }
 }

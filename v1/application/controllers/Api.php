@@ -11,6 +11,10 @@ class Api extends REST_Controller
         parent::__construct();
     }
 
+    public function index_get(){
+        return $this->set_response($this->api_model->generateOutput(false, array('Error: nepoznata metoda'), false));
+    }
+
     public function bans_get()
     {
         if ($this->api_model->checkAuth($this->input->get('apikey'))) {
@@ -76,9 +80,14 @@ class Api extends REST_Controller
                 'steamid' => $this->input->get('steamid'),
                 'ip' => $this->input->get('ip'),
                 'server_ip' => $this->input->get('server_ip'),
+                'resource' => $this->input->get('resource')
             );
 
-            $this->api_model->banAdd($data);
+            if($this->api_model->banAdd($data)){
+                return $this->set_response($this->api_model->generateOutput(true, array(), true));
+            }else{
+                return $this->set_response($this->api_model->generateOutput(false, array('Error: desio se problem prilikom upisivanja bana'), false));
+            }
 
         } else {
             return $this->set_response($this->api_model->generateOutput(false, array('Error: apikey potreban'), false));
@@ -108,5 +117,32 @@ class Api extends REST_Controller
         }
 
     }
+
+    public function version_get($type = null){
+
+        if ($this->api_model->checkAuth($this->input->get('apikey'))) {
+
+            $typelist = array('api', 'server');
+
+            if (!in_array($type, $typelist)) {
+                return $this->set_response($this->api_model->generateOutput(false, array('Error: type nije validan'), false));
+            }
+
+            $version = $this->api_model->version($type);
+
+            if($version === false){
+                return $this->set_response($this->api_model->generateOutput(false, array('Error: pogresan izbor'), false));
+            }else{
+                return $this->set_response($this->api_model->generateOutput(true, array(), $version));
+            }
+            
+
+        } else {
+            return $this->set_response($this->api_model->generateOutput(false, array('Error: apikey potreban'), false));
+        }
+
+    }
+
+ 
 
 }
