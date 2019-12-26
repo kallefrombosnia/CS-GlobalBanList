@@ -109,9 +109,15 @@ class Api extends REST_Controller
                 return $this->set_response($this->api_model->generateOutput(false, array('Error: type nije validan'), false));
             }
             
-            $boolValue = $this->api_model->banDelete($type, $id);
-            return $this->set_response($this->api_model->generateOutput(true, array(), $boolValue));
+            if($this->api_model->isAdmin($this->input->get('apikey'))){
 
+                $boolValue = $this->api_model->banDelete($type, $id);
+                return $this->set_response($this->api_model->generateOutput(true, array(), $boolValue));
+
+            }else{
+                return $this->set_response($this->api_model->generateOutput(false, array('Error: nisi admin'), false));
+            }
+             
         } else {
             return $this->set_response($this->api_model->generateOutput(false, array('Error: apikey potreban'), false));
         }
@@ -141,6 +147,23 @@ class Api extends REST_Controller
             return $this->set_response($this->api_model->generateOutput(false, array('Error: apikey potreban'), false));
         }
 
+    }
+
+    public function test_get(){
+        if ($this->api_model->checkAuth($this->input->get('apikey'))) {
+            
+            if($this->api_model->isAdmin($this->input->get('apikey'))){
+
+            
+                return $this->set_response($this->api_model->generateOutput(true, array(), true));
+
+            }else{
+                return $this->set_response($this->api_model->generateOutput(false, array('Error: nisi admin'), false));
+            }
+             
+        } else {
+            return $this->set_response($this->api_model->generateOutput(false, array('Error: apikey potreban'), false));
+        }
     }
 
  

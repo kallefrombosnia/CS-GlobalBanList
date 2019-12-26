@@ -29,7 +29,7 @@ class Api_model extends CI_Model
 
         if($this->config->item('auth')){
             if(!is_null($apikey)){
-                $query = $this->db->query("SELECT 1 FROM `access_keys` WHERE `access_key`= $apikey LIMIT 1");
+                $query = $this->db->query("SELECT `id` FROM `access_keys` WHERE access_key= $apikey ");
 
                 if($query->num_rows() > 0){
                     //key exists
@@ -41,6 +41,24 @@ class Api_model extends CI_Model
             // disabled in config but still pass function
             return true;
         }     
+    }
+
+    public function isAdmin($apikey = null){
+
+            if(!is_null($apikey)){
+
+                $query = $this->db->query("SELECT `admin` FROM `access_keys` WHERE access_key= $apikey");
+                $data = $query->result_array();
+      
+                if($data[0]['admin'] === '1' or in_array($apikey,$this->config->item('admin_keys'))){
+                    //key exists in db or array
+                    return true;
+                }
+                
+                return false;
+            }
+
+            return false;
     }
 
 
