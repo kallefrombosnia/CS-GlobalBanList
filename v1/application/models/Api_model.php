@@ -6,20 +6,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class Api_model extends CI_Model
 
 {
-    /*
-   function __call($method, $arguments){
-	
-        if(method_exists($this, $method)) {
-            if($this->api_model->checkAuth($this->input->get('apikey'))){
-				return ('good');
-				return call_user_func_array(array($this,$method),$arguments);
-			}
-			echo('bad');
-			return $this->set_response($this->api_model->generateOutput(false, array('Error: apikey potreban'), false));
-        }
-        return ('good');
-    }
-    */
     
     public function generateOutput($success, $errors, $data) {
 		return array('success' => $success, 'errors' => $errors, 'data' => $data);
@@ -45,7 +31,7 @@ class Api_model extends CI_Model
 
     public function isAdmin($apikey = null){
 
-            if(!is_null($apikey)){
+            if(!is_null($apikey)){ 
 
                 $query = $this->db->query("SELECT `admin` FROM `access_keys` WHERE access_key= $apikey");
                 $data = $query->result_array();
@@ -53,8 +39,8 @@ class Api_model extends CI_Model
                 if($data[0]['admin'] === '1' or in_array($apikey,$this->config->item('admin_keys'))){
                     //key exists in db or array
                     return true;
-                }
-                
+                } 
+
                 return false;
             }
 
@@ -115,7 +101,33 @@ class Api_model extends CI_Model
                 return $info[0]['plugin_version']; 
             default:
                     return false;
-                break;
+            break;
         }
+    }
+
+    public function serverExists($ip){
+        $query = $this->db->query("SELECT 1 FROM `access_keys` WHERE `server_address`= ".$this->db->escape($ip)." LIMIT 1");
+
+        return $query->num_rows() > 0 ? true : false;
+    }
+
+    public function addServer($data){
+
+        // todo: migration for admin who made new record
+        $this->db->set('admin', '0', FALSE);
+        $this->db->set('banned', '0', FALSE);
+        $this->db->set('created_at', 'NOW()', FALSE);
+        $this->db->set('updated_at', 'NOW()', FALSE);
+        $this->db->set('server_address', $data['server_address']);
+        $this->db->set('access_key', $this->generateKey());
+        $this->db->insert('access_keys');
+
+        $query = $this->db->query("SELECT * FROM `access_keys` WHERE `server_address`= ".$this->db->escape($data['server_address'])." LIMIT 1");
+
+        return $query->result_array();
+    }
+    
+    private function generateKey(){
+        return md5(rand());   
     }
 }

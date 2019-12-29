@@ -148,6 +148,37 @@ class Api extends REST_Controller
         }
 
     }
+    
+    public function serveradd_post(){
+
+        if ($this->api_model->checkAuth($this->input->post('apikey'))) {
+            
+            if($this->api_model->isAdmin($this->input->post('apikey'))){
+               
+                $data = array(
+                    'server_address' => $this->input->post('address'),
+                    'apikey' => $this->input->post('apikey')
+                );
+
+                if(!$this->api_model->serverExists($data['server_address'])){
+
+                    $serverInfo = $this->api_model->addServer($data);
+                    return $this->set_response($this->api_model->generateOutput(true, array(), $serverInfo));
+
+                }else{
+                    return $this->set_response($this->api_model->generateOutput(false, array('Error: server vec postoji'), false));
+                }
+        
+            }else{
+                return $this->set_response($this->api_model->generateOutput(false, array('Error: nisi admin'), false));
+            }
+             
+        } else {
+            return $this->set_response($this->api_model->generateOutput(false, array('Error: apikey potreban'), false));
+        }
+        
+
+    }
 
     public function test_get(){
         if ($this->api_model->checkAuth($this->input->get('apikey'))) {
@@ -160,6 +191,7 @@ class Api extends REST_Controller
             }else{
                 return $this->set_response($this->api_model->generateOutput(false, array('Error: nisi admin'), false));
             }
+
              
         } else {
             return $this->set_response($this->api_model->generateOutput(false, array('Error: apikey potreban'), false));
