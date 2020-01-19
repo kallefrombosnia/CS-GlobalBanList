@@ -17,7 +17,7 @@ class Api_model extends CI_Model
             if(!is_null($apikey)){
                 $query = $this->db->query("SELECT `id` FROM `access_keys` WHERE access_key= $apikey ");
 
-                if($query->num_rows() > 0){
+                if($query->num_rows() > 0 or in_array($apikey,$this->config->item('admin_keys'))){
                     //key exists
                     return true;
                 }
@@ -36,7 +36,7 @@ class Api_model extends CI_Model
                 $query = $this->db->query("SELECT `admin` FROM `access_keys` WHERE access_key= $apikey");
                 $data = $query->result_array();
       
-                if($data[0]['admin'] === '1' or in_array($apikey,$this->config->item('admin_keys'))){
+                if(@$data[0]['admin'] === '1' or in_array($apikey,$this->config->item('admin_keys'))){
                     //key exists in db or array
                     return true;
                 } 
