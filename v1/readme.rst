@@ -1,3 +1,5 @@
+Dont use it :)
+
 ###################
 CS-GlobalBanList API
 ###################
